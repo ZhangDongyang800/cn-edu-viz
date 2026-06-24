@@ -1,3 +1,29 @@
+# 如何启动
+
+```
+#启动后端步骤
+cd my-server
+##第一次请先下载依赖
+npm install
+##启动
+node app.js
+
+
+#启动前端步骤
+cd my-vue
+##第一次请先下载依赖
+npm install
+##启动
+npm run dev
+
+
+
+```
+
+
+
+
+
 【腾讯文档】大数据技术分布式集群实践（2024级）-数据集与题目关系
  https://docs.qq.com/sheet/DTFRKSnRIQ0tqUnRs
 
