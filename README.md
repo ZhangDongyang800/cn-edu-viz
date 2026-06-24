@@ -16,3 +16,153 @@
 | 基本功能要求 | 项目使用大数据Flume、Hadoop、Spark等技术，对数据进行采集、清洗、分析，结合后端技术（包括不局限于Servlet、JSP、Spring Boot等）和前端技术（HTML、CSS、JavaScript、  、jQuery、AJAX、Vue等），最后进行可视化展现。  功能要求：  1、数据采集：搜集近十年全国及各省市教育相关的数据。  2、数据清洗：对采集到的数据进行清洗和整合，包括去除重复数据、填充缺失值、转换数据类型等，确保数据质量和一致性。  3、数据分析：对数据进行多维度、多粒度的分析。包括但不限于以下维度和粒度：  (1) 全国各类学校、教职工、专任教师数变化分析；  (2) 全国各类学历在校学生数据分析；  (3) 全国各类学校招生数、毕业生数、研究生数据分析；  (4) 职业技术培训机构数据分析；  (5) 初中学校和学生数据分析；  (6) 小学学校和学生数据分析；  5、数据可视化：将分析结果以图表的形式进行可视化展示，包括但不限于柱状图、折线图、饼图、地图等。 |
 | 非功能性要求 | 1、性能要求：系统应能高效处理大量数据，确保快速响应。  2、用户界面：界面应直观易用，适合非技术背景用户。  3、可扩展性：系统设计应考虑未来的扩展性和可维护性。  4、文档和帮助：提供清晰的用户手册和在线帮助。 |
 
+所有表DESCRIBE结果：Field Type Null Key Default Extra
+
+分省在校生数:
+
+地区	varchar(255)	YES			
+2025年	varchar(255)	YES			
+2024年	double	YES			
+2023年	double	YES			
+2022年	double	YES			
+2021年	double	YES			
+2020年	double	YES			
+2019年	double	YES			
+2018年	double	YES			
+2017年	double	YES			
+2016年	double	YES			
+_c11	varchar(255)	YES			
+
+分省学位数:
+
+地区	varchar(255)	YES			
+2025年	varchar(255)	YES			
+2024年	double	YES			
+2023年	double	YES			
+2022年	double	YES			
+2021年	double	YES			
+2020年	double	YES			
+2019年	double	YES			
+2018年	double	YES			
+2017年	double	YES			
+2016年	double	YES			
+_c11	varchar(255)	YES			
+
+分省招生数:
+
+地区	varchar(255)	YES			
+2025年	varchar(255)	YES			
+2024年	double	YES			
+2023年	double	YES			
+2022年	double	YES			
+2021年	double	YES			
+2020年	double	YES			
+2019年	double	YES			
+2018年	double	YES			
+2017年	double	YES			
+2016年	double	YES			
+_c11	varchar(255)	YES			
+
+分省毕业生数：
+
+地区	varchar(255)	YES			
+2025年	varchar(255)	YES			
+2024年	double	YES			
+2023年	double	YES			
+2022年	double	YES			
+2021年	double	YES			
+2020年	double	YES			
+2019年	double	YES			
+2018年	double	YES			
+2017年	double	YES			
+2016年	double	YES			
+_c11	varchar(255)	YES			
+
+在校生数:
+
+指标	varchar(255)	YES			
+2025年	double	YES			
+2024年	double	YES			
+2023年	double	YES			
+2022年	double	YES			
+2021年	double	YES			
+2020年	double	YES			
+2019年	double	YES			
+2018年	double	YES			
+2017年	double	YES			
+2016年	double	YES			
+2015年	double	YES			
+2014年	double	YES			
+2013年	double	YES			
+2012年	double	YES			
+2011年	double	YES			
+_c16	varchar(255)	YES			
+
+学校数：
+
+地区	varchar(255)	YES			
+2024年	int	YES			
+2023年	int	YES			
+2022年	int	YES			
+2021年	int	YES			
+2020年	int	YES			
+2019年	int	YES			
+2018年	int	YES			
+2017年	int	YES			
+2016年	int	YES			
+_c10	varchar(255)	YES			
+
+招生数:
+
+指标	varchar(255)	YES			
+2025年	double	YES			
+2024年	double	YES			
+2023年	double	YES			
+2022年	double	YES			
+2021年	double	YES			
+2020年	double	YES			
+2019年	double	YES			
+2018年	double	YES			
+2017年	double	YES			
+2016年	double	YES			
+2015年	double	YES			
+2014年	double	YES			
+2013年	double	YES			
+2012年	double	YES			
+2011年	double	YES			
+_c16	varchar(255)	YES			
+
+教育经费:
+
+地区	varchar(255)	YES			
+2025年	varchar(255)	YES			
+2024年	varchar(255)	YES			
+2023年	int	YES			
+2022年	int	YES			
+2021年	int	YES			
+2020年	int	YES			
+2019年	int	YES			
+2018年	int	YES			
+2017年	int	YES			
+2016年	int	YES			
+_c11	varchar(255)	YES			
+
+毕业生数：
+
+指标	varchar(255)	YES			
+2025年	double	YES			
+2024年	double	YES			
+2023年	double	YES			
+2022年	double	YES			
+2021年	double	YES			
+2020年	double	YES			
+2019年	double	YES			
+2018年	double	YES			
+2017年	double	YES			
+2016年	double	YES			
+2015年	double	YES			
+2014年	double	YES			
+2013年	double	YES			
+2012年	double	YES			
+2011年	double	YES			
+_c16	varchar(255)	YES			
