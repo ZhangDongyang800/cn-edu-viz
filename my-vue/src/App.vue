@@ -13,6 +13,8 @@ const navItems = [
 
 <template>
   <div class="app">
+    <!-- 跳过导航链接，方便键盘用户 -->
+    <a href="#main-content" class="skip-link">跳到主要内容</a>
     <!-- 顶部品牌栏 -->
     <header class="brand">
       <div class="brand-inner">
@@ -29,7 +31,7 @@ const navItems = [
     </header>
 
     <!-- 页面内容区 -->
-    <main class="page">
+    <main id="main-content" class="page">
       <router-view />
     </main>
 
@@ -98,7 +100,7 @@ body {
   font-size: 14px;
   color: #94a3b8;
   text-decoration: none;
-  transition: all .2s ease;
+  transition: color .2s ease, background-color .2s ease;
 }
 .nav-link:hover {
   color: #e2e8f0;
@@ -108,6 +110,28 @@ body {
   color: #fff;
   background: rgba(255,255,255,0.12);
   font-weight: 500;
+}
+/* 键盘焦点可见样式 */
+.nav-link:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 2px;
+}
+
+/* 跳过导航链接：默认隐藏，聚焦时显示 */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 16px;
+  background: #0f172a;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 0 0 6px 6px;
+  font-size: 14px;
+  z-index: 100;
+  text-decoration: none;
+}
+.skip-link:focus {
+  top: 0;
 }
 
 /* 页面内容区 */

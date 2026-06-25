@@ -53,7 +53,34 @@ function render() {
         top: 0,
         textStyle: { fontSize: 15, fontWeight: 600, color: '#0f172a' }
       },
-      tooltip: { trigger: 'axis', ...baseTooltip },
+      tooltip: {
+        trigger: 'axis',
+        ...baseTooltip,
+        confine: true,
+        formatter: (params) => {
+          // 过滤 0 / null，按数值降序，取 Top 8
+          let filtered = params.filter(p => p.value !== 0 && p.value != null)
+          filtered.sort((a, b) => b.value - a.value)
+          if (!filtered.length) return params[0]?.axisValue || ''
+
+          const SHOW_TOP = 8
+          const topItems = filtered.slice(0, SHOW_TOP)
+          const restCount = filtered.length - SHOW_TOP
+
+          let html = `<div style="font-weight:600;margin-bottom:6px;font-size:13px">${filtered[0].axisValue}</div>`
+          topItems.forEach(p => {
+            html += `<div style="display:flex;align-items:center;gap:8px;margin:3px 0;font-size:12px">
+              <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${p.color}"></span>
+              <span style="flex:1;white-space:nowrap">${p.seriesName}</span>
+              <span style="font-weight:600;margin-left:12px">${p.value}</span>
+            </div>`
+          })
+          if (restCount > 0) {
+            html += `<div style="margin-top:6px;padding-top:4px;border-top:1px solid rgba(255,255,255,0.15);font-size:11px;color:#94a3b8">还有 ${restCount} 项未显示</div>`
+          }
+          return html
+        }
+      },
       legend: {
         type: 'scroll',
         bottom: 0,
@@ -141,7 +168,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div ref="chartRef" class="chart"></div>
+  <div ref="chartRef" class="chart" role="img" :aria-label="title ? title + '图表' : '数据图表'"></div>
 </template>
 
 <style scoped>

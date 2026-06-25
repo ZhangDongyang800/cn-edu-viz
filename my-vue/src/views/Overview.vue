@@ -5,6 +5,7 @@ import DataChart from '../components/DataChart.vue'
 const kpiList = ref([])
 const trendData = ref([])
 const trendColumns = ref([])
+const errorMsg = ref('')
 
 onMounted(async () => {
   try {
@@ -32,12 +33,15 @@ onMounted(async () => {
     trendColumns.value = Object.keys(data[0] || {})
   } catch (e) {
     console.error(e)
+    errorMsg.value = '数据加载失败，请稍后重试'
   }
 })
 </script>
 
 <template>
   <div>
+    <!-- 异步状态通知区域 -->
+    <div v-if="errorMsg" class="error-msg" role="alert">{{ errorMsg }}</div>
     <!-- 页面标题区 -->
     <header class="hero">
       <h1 class="hero-title">中国十年教育数据总览</h1>
@@ -139,6 +143,16 @@ onMounted(async () => {
 .kpi-delta.up { color: #16a34a; }
 .kpi-delta.down { color: #dc2626; }
 
+/* 错误提示样式 */
+.error-msg {
+  background: #fef2f2;
+  color: #dc2626;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
 /* 图表区块 */
 .chart-section {
   margin-top: 8px;
@@ -170,5 +184,10 @@ onMounted(async () => {
   .hero-title { font-size: 24px; }
   .kpi { padding: 16px; }
   .kpi-num { font-size: 22px; }
+}
+/* 尊重用户减少动画偏好 */
+@media (prefers-reduced-motion: reduce) {
+  .kpi { transition: none; }
+  .kpi:hover { transform: none; box-shadow: none; }
 }
 </style>

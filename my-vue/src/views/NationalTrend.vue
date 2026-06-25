@@ -10,12 +10,19 @@ const items = [
 const active = ref('在校生数')
 const chartData = ref([])
 const chartColumns = ref([])
+const errorMsg = ref('')
 
 async function load() {
-  const res = await fetch(`/api/data/${active.value}`)
-  const data = await res.json()
-  chartData.value = data
-  chartColumns.value = Object.keys(data[0] || {})
+  try {
+    errorMsg.value = ''
+    const res = await fetch(`/api/data/${active.value}`)
+    const data = await res.json()
+    chartData.value = data
+    chartColumns.value = Object.keys(data[0] || {})
+  } catch (e) {
+    console.error(e)
+    errorMsg.value = '数据加载失败，请稍后重试'
+  }
 }
 
 onMounted(load)
@@ -23,6 +30,8 @@ onMounted(load)
 
 <template>
   <div>
+    <!-- 异步状态通知区域 -->
+    <div v-if="errorMsg" class="error-msg" role="alert">{{ errorMsg }}</div>
     <!-- 页面标题区 -->
     <header class="hero">
       <h1 class="hero-title">全国趋势</h1>
@@ -79,7 +88,7 @@ onMounted(load)
   font-size: 14px;
   cursor: pointer;
   border-radius: 8px;
-  transition: all .2s ease;
+  transition: color .2s ease, background-color .2s ease;
   font-weight: 500;
 }
 .subnav-btn:hover {
@@ -89,6 +98,21 @@ onMounted(load)
 .subnav-btn.active {
   color: #fff;
   background: #0f172a;
+}
+/* 键盘焦点可见样式 */
+.subnav-btn:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 2px;
+}
+
+/* 错误提示样式 */
+.error-msg {
+  background: #fef2f2;
+  color: #dc2626;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 14px;
 }
 
 /* 图表容器 */

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import * as echarts from 'echarts'
 
 const items = [
@@ -24,6 +24,7 @@ const currentUnit = computed(() => items.find(i => i.key === active.value)?.unit
 const yearList = ref([])       // 可选年份列表
 const activeYear = ref('')     // 当前选中年份
 let rawData = []               // 缓存原始数据
+const errorMsg = ref('')       // 错误提示
 
 // 加载中国地图 GeoJSON 并注册
 async function loadChinaMap() {
@@ -62,7 +63,11 @@ function renderCharts() {
       backgroundColor: 'rgba(15,23,42,0.92)',
       borderColor: 'transparent',
       textStyle: { color: '#fff' },
-      formatter: (params) => `${params[0].name}: ${params[0].value} ${currentUnit.value}`
+      confine: true,
+      formatter: (params) => {
+        const p = params[0]
+        return `${p.name}: ${p.value} ${currentUnit.value}`
+      }
     },
     grid: { left: 80, right: 24, bottom: 24, top: 44 },
     xAxis: {
@@ -107,6 +112,7 @@ function renderCharts() {
       backgroundColor: 'rgba(15,23,42,0.92)',
       borderColor: 'transparent',
       textStyle: { color: '#fff' },
+      confine: true,
       formatter: (params) => params.value != null
         ? `${params.name}: ${params.value} ${currentUnit.value}`
         : `${params.name}: 暂无数据`
@@ -142,16 +148,22 @@ function renderCharts() {
 
 // 加载数据
 async function load() {
-  const res = await fetch(`/api/data/${active.value}`)
-  rawData = await res.json()
-  // 提取所有年份列
-  const yearCols = Object.keys(rawData[0] || {}).filter(c => /\d{4}年/.test(c))
-  yearList.value = yearCols
-  // 默认选最新年份
-  if (!activeYear.value || !yearCols.includes(activeYear.value)) {
-    activeYear.value = yearCols[yearCols.length - 1]
+  try {
+    errorMsg.value = ''
+    const res = await fetch(`/api/data/${active.value}`)
+    rawData = await res.json()
+    // 提取所有年份列
+    const yearCols = Object.keys(rawData[0] || {}).filter(c => /\d{4}年/.test(c))
+    yearList.value = yearCols
+    // 默认选最新年份
+    if (!activeYear.value || !yearCols.includes(activeYear.value)) {
+      activeYear.value = yearCols[yearCols.length - 1]
+    }
+    renderCharts()
+  } catch (e) {
+    console.error(e)
+    errorMsg.value = '数据加载失败，请稍后重试'
   }
-  renderCharts()
 }
 
 // 切换指标时重置年份并重新加载
@@ -161,15 +173,26 @@ function switchItem(key) {
   load()
 }
 
+// 窗口自适应处理函数
+function onResize() { barInst?.resize(); mapInst?.resize() }
+
 onMounted(async () => {
   await loadChinaMap()
   load()
-  window.addEventListener('resize', () => { barInst?.resize(); mapInst?.resize() })
+  window.addEventListener('resize', onResize)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', onResize)
+  barInst?.dispose()
+  mapInst?.dispose()
 })
 </script>
 
 <template>
   <div>
+    <!-- 异步状态通知区域 -->
+    <div v-if="errorMsg" class="error-msg" role="alert">{{ errorMsg }}</div>
     <!-- 页面标题区 -->
     <header class="hero">
       <h1 class="hero-title">分省对比</h1>
@@ -239,7 +262,7 @@ onMounted(async () => {
   font-size: 14px;
   cursor: pointer;
   border-radius: 8px;
-  transition: all .2s ease;
+  transition: color .2s ease, background-color .2s ease;
   font-weight: 500;
 }
 .subnav-btn:hover {
@@ -249,6 +272,12 @@ onMounted(async () => {
 .subnav-btn.active {
   color: #fff;
   background: #0f172a;
+}
+/* 键盘焦点可见样式 */
+.subnav-btn:focus-visible,
+.year-btn:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 2px;
 }
 
 /* 年份选择行 */
@@ -266,7 +295,7 @@ onMounted(async () => {
   font-size: 13px;
   cursor: pointer;
   border-radius: 6px;
-  transition: all .15s ease;
+  transition: color .15s ease, background-color .15s ease, border-color .15s ease;
 }
 .year-btn:hover {
   border-color: #94a3b8;
@@ -285,6 +314,16 @@ onMounted(async () => {
   color: #64748b;
   font-weight: 500;
   align-self: center;
+}
+
+/* 错误提示样式 */
+.error-msg {
+  background: #fef2f2;
+  color: #dc2626;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 14px;
 }
 
 /* 双栏网格 */

@@ -9,7 +9,7 @@ defineProps({
 
 <template>
   <div class="table-wrap">
-    <div v-if="loading" class="loading">加载中...</div>
+    <div v-if="loading" class="loading" role="status" aria-live="polite">加载中…</div>
     <table v-else-if="data.length">
       <thead>
         <tr>
@@ -22,7 +22,7 @@ defineProps({
         </tr>
       </tbody>
     </table>
-    <div v-else class="loading">暂无数据</div>
+    <div v-else class="loading" role="status" aria-live="polite">暂无数据</div>
   </div>
 </template>
 
