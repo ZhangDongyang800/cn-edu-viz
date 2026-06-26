@@ -1,4 +1,5 @@
-# 依赖目录
+
+# 依赖目录
 node_modules/
 
 # 构建产物
@@ -28,3 +29,7 @@ Thumbs.db
 
 # 系统目录缓存
 __pycache__/
+
+
+docs/
+.trae

@@ -2,17 +2,32 @@
 
 ## 快速启动
 
-### 后端
+> **启动顺序**：MySQL → Python 分析服务 → Node.js 后端 → Vue 前端（每个服务需单独开一个终端）
+
+### 1. Python 分析服务（Conda 环境）
+
+```bash
+cd py-analysis
+# 创建并激活 Conda 虚拟环境
+conda create -n edu-viz python=3.11 -y
+conda activate edu-viz
+# 第一次请先下载依赖
+pip install -r requirements.txt
+# 启动
+python main.py
+```
+
+### 2. Node.js 后端
 
 ```bash
 cd my-server
 # 第一次请先下载依赖
 npm install
 # 启动
-node app.js
+node add.js
 ```
 
-### 前端
+### 3. Vue 前端
 
 ```bash
 cd my-vue

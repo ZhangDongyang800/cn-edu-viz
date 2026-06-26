@@ -1,6 +1,10 @@
 <script setup>
-import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
+import { ref, watch, onMounted, onBeforeUnmount, onActivated } from 'vue'
 import * as echarts from 'echarts'
+import {
+  darkTooltip, mainPalette, baseGrid, titleStyle,
+  axisLineStyle, splitLineStyle, axisLabelStyle, buildTooltipHtml
+} from '../utils/echarts-config'
 
 // 接收表格数据和列名
 const props = defineProps({
@@ -12,8 +16,8 @@ const props = defineProps({
 const chartRef = ref(null)
 let chartInstance = null
 
-// 数据变化时重新渲染图表
-watch(() => props.data, () => render(), { deep: true })
+// 数据变化时重新渲染图表（浅监听即可，data 是整体替换的）
+watch(() => props.data, () => render())
 
 function render() {
   if (!chartRef.value) return
@@ -21,17 +25,9 @@ function render() {
   if (!props.data.length) { chartInstance.clear(); return }
 
   const firstCol = props.columns[0]
-  // 提取年份列
   const yearCols = props.columns.filter(c => /\d{4}年/.test(c))
   const isProvince = firstCol === '地区'
   const isIndicator = firstCol === '指标'
-
-  // 统一的基础配置
-  const baseTooltip = {
-    backgroundColor: 'rgba(15,23,42,0.92)',
-    borderColor: 'transparent',
-    textStyle: { color: '#fff' }
-  }
 
   if (isIndicator && yearCols.length > 0) {
     // 全国指标数据：折线图
@@ -46,111 +42,66 @@ function render() {
       data: yearCols.map(c => row[c] ?? null)
     }))
 
+    // y 轴数值统一保留两位小数，防止出现一长串小数
+    const yAxisFormatter = v => Number.isFinite(v) ? v.toFixed(2) : v
+
     chartInstance.setOption({
-      title: {
-        text: props.title + ' 趋势',
-        left: 0,
-        top: 0,
-        textStyle: { fontSize: 15, fontWeight: 600, color: '#0f172a' }
-      },
-      tooltip: {
-        trigger: 'axis',
-        ...baseTooltip,
-        confine: true,
-        formatter: (params) => {
-          // 过滤 0 / null，按数值降序，取 Top 8
-          let filtered = params.filter(p => p.value !== 0 && p.value != null)
-          filtered.sort((a, b) => b.value - a.value)
-          if (!filtered.length) return params[0]?.axisValue || ''
-
-          const SHOW_TOP = 8
-          const topItems = filtered.slice(0, SHOW_TOP)
-          const restCount = filtered.length - SHOW_TOP
-
-          let html = `<div style="font-weight:600;margin-bottom:6px;font-size:13px">${filtered[0].axisValue}</div>`
-          topItems.forEach(p => {
-            html += `<div style="display:flex;align-items:center;gap:8px;margin:3px 0;font-size:12px">
-              <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${p.color}"></span>
-              <span style="flex:1;white-space:nowrap">${p.seriesName}</span>
-              <span style="font-weight:600;margin-left:12px">${p.value}</span>
-            </div>`
-          })
-          if (restCount > 0) {
-            html += `<div style="margin-top:6px;padding-top:4px;border-top:1px solid rgba(255,255,255,0.15);font-size:11px;color:#94a3b8">还有 ${restCount} 项未显示</div>`
-          }
-          return html
-        }
-      },
+      title: { ...titleStyle, text: props.title + ' 趋势' },
+      tooltip: { trigger: 'axis', ...darkTooltip, formatter: params => buildTooltipHtml(params, '万人') },
       legend: {
-        type: 'scroll',
-        bottom: 0,
-        itemWidth: 12,
-        itemHeight: 12,
+        type: 'scroll', bottom: 0,
+        itemWidth: 12, itemHeight: 12,
         textStyle: { color: '#475569' }
       },
-      grid: { left: 52, right: 24, bottom: 44, top: 44 },
+      grid: { ...baseGrid, bottom: 44 },
       xAxis: {
-        type: 'category',
-        data: years,
-        axisLine: { lineStyle: { color: '#e2e8f0' } },
-        axisLabel: { color: '#64748b' },
-        axisTick: { show: false }
+        type: 'category', data: years,
+        axisLine: axisLineStyle, axisLabel: axisLabelStyle, axisTick: { show: false }
       },
       yAxis: {
-        type: 'value',
-        splitLine: { lineStyle: { color: '#f1f5f9' } },
-        axisLabel: { color: '#64748b' }
+        type: 'value', splitLine: splitLineStyle,
+        axisLabel: { ...axisLabelStyle, formatter: yAxisFormatter }
       },
-      // 克制的蓝灰色调色板
-      color: [
-        '#0f172a', '#334155', '#475569', '#64748b',
-        '#94a3b8', '#cbd5e1', '#2563eb', '#7c3aed'
-      ],
+      color: mainPalette,
       series
     }, true)
   } else if (isProvince && yearCols.length > 0) {
-    // 分省数据：柱状图，取最新年份前 20 个地区
+    // 分省数据：柱状图，取最新年份按数值排序后前 20 个地区
     const latestYear = yearCols[yearCols.length - 1]
     const topData = props.data
       .filter(row => row[latestYear] != null && row[firstCol] !== '全国')
+      .sort((a, b) => b[latestYear] - a[latestYear])
       .slice(0, 20)
 
+    // 分省柱状图 tooltip 与 y 轴同样保留两位小数
+    const barTooltip = params => {
+      const p = params[0]
+      const v = p?.value
+      return `${p?.name}: ${Number.isFinite(v) ? v.toFixed(2) : v}`
+    }
+    const barYAxisFormatter = v => Number.isFinite(v) ? v.toFixed(2) : v
+
     chartInstance.setOption({
-      title: {
-        text: `${props.title} - ${latestYear}`,
-        left: 0,
-        top: 0,
-        textStyle: { fontSize: 15, fontWeight: 600, color: '#0f172a' }
-      },
-      tooltip: {
-        trigger: 'axis',
-        ...baseTooltip,
-        formatter: '{b}: {c}'
-      },
-      grid: { left: 52, right: 24, bottom: 80, top: 44 },
+      title: { ...titleStyle, text: `${props.title} - ${latestYear}` },
+      tooltip: { trigger: 'axis', ...darkTooltip, formatter: barTooltip },
+      grid: { ...baseGrid, bottom: 72 },
       xAxis: {
         type: 'category',
         data: topData.map(r => r[firstCol]),
-        axisLine: { lineStyle: { color: '#e2e8f0' } },
-        axisLabel: { rotate: 45, color: '#64748b', fontSize: 11 },
+        axisLine: axisLineStyle,
+        axisLabel: { ...axisLabelStyle, rotate: 35, fontSize: 11, interval: 0 },
         axisTick: { show: false }
       },
       yAxis: {
-        type: 'value',
-        splitLine: { lineStyle: { color: '#f1f5f9' } },
-        axisLabel: { color: '#64748b' }
+        type: 'value', splitLine: splitLineStyle,
+        axisLabel: { ...axisLabelStyle, formatter: barYAxisFormatter }
       },
       series: [{
         type: 'bar',
         data: topData.map(r => r[latestYear]),
-        itemStyle: {
-          color: '#0f172a',
-          borderRadius: [4, 4, 0, 0]
-        },
+        itemStyle: { color: '#0f172a', borderRadius: [4, 4, 0, 0] },
         barWidth: '55%',
-        emphasis: {
-          itemStyle: { color: '#334155' }
-        }
+        emphasis: { itemStyle: { color: '#334155' } }
       }]
     }, true)
   } else {
@@ -161,6 +112,7 @@ function render() {
 // 窗口自适应
 function onResize() { chartInstance?.resize() }
 onMounted(() => window.addEventListener('resize', onResize))
+onActivated(() => onResize())  // keep-alive 激活时 resize
 onBeforeUnmount(() => {
   window.removeEventListener('resize', onResize)
   chartInstance?.dispose()
@@ -174,6 +126,6 @@ onBeforeUnmount(() => {
 <style scoped>
 .chart {
   width: 100%;
-  height: 420px;
+  height: 440px;
 }
 </style>
