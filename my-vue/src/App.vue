@@ -1,39 +1,45 @@
 <script setup>
 import { useRoute } from 'vue-router'
+import { useAuth } from './stores/auth'
 
 const route = useRoute()
+const { username, isLoggedIn, logout } = useAuth()
 
 const navItems = [
-  { path: '/overview', label: '数据总览' },
-  { path: '/national-trend', label: '全国趋势' },
-  { path: '/provincial-compare', label: '分省对比' },
-  { path: '/structure-analysis', label: '结构分析' },
+  { path: '/dashboard', label: '数据可视化' },
+  { path: '/trend-prediction', label: '趋势预测' },
 ]
 </script>
 
 <template>
   <div class="app">
-    <!-- 顶部品牌栏 -->
+    <a href="#main-content" class="skip-link">跳到主要内容</a>
     <header class="brand">
       <div class="brand-inner">
         <div class="brand-logo">EDU·VIZ</div>
-        <nav class="main-nav">
-          <router-link
-            v-for="n in navItems"
-            :key="n.path"
-            :to="n.path"
-            :class="['nav-link', { active: route.path === n.path }]"
-          >{{ n.label }}</router-link>
-        </nav>
+        <div class="brand-actions">
+          <nav class="main-nav">
+            <router-link
+              v-for="n in navItems"
+              :key="n.path"
+              :to="n.path"
+              :class="['nav-link', { active: route.path === n.path || route.path.startsWith(n.path + '/') }]"
+            >{{ n.label }}</router-link>
+          </nav>
+          <div class="nav-right">
+            <template v-if="isLoggedIn">
+              <span class="user-name">{{ username }}</span>
+              <button class="logout-btn" @click="logout">退出</button>
+            </template>
+          </div>
+        </div>
       </div>
     </header>
 
-    <!-- 页面内容区 -->
-    <main class="page">
+    <main id="main-content" class="page">
       <router-view />
     </main>
 
-    <!-- 页脚 -->
     <footer class="footer">
       <span>中国十年教育数据分析与可视化</span>
     </footer>
@@ -45,7 +51,6 @@ const navItems = [
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 html {
-  /* 使用更现代的无衬线字体栈 */
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
     "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -57,6 +62,66 @@ body {
   color: #1a1a1a;
   line-height: 1.6;
 }
+
+/* ========== 视图页面公共样式 ========== */
+
+.hero { margin-bottom: 24px; }
+.hero-title {
+  font-size: 32px; font-weight: 700; letter-spacing: -0.5px;
+  line-height: 1.2; color: #0f172a; margin-bottom: 8px;
+}
+.hero-desc { font-size: 15px; color: #64748b; max-width: 560px; }
+
+.subnav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.subnav-btn {
+  padding: 8px 20px; border: none; background: transparent;
+  color: #64748b; font-size: 14px; cursor: pointer; border-radius: 8px;
+  transition: color .2s ease, background-color .2s ease; font-weight: 500;
+}
+.subnav-btn:hover { color: #0f172a; background: #e2e8f0; }
+.subnav-btn.active { color: #fff; background: #0f172a; }
+.subnav-btn:focus-visible {
+  outline: 2px solid #60a5fa; outline-offset: 2px;
+}
+
+.year-nav { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 24px; }
+.year-btn {
+  padding: 5px 12px; border: 1px solid #e2e8f0; background: #fff;
+  color: #475569; font-size: 13px; cursor: pointer; border-radius: 6px;
+  transition: all .15s ease;
+}
+.year-btn:hover { border-color: #94a3b8; color: #0f172a; }
+.year-btn.active { background: #0f172a; color: #fff; border-color: #0f172a; }
+.year-btn:focus-visible {
+  outline: 2px solid #60a5fa; outline-offset: 2px;
+}
+
+.unit-tag { margin-left: auto; font-size: 13px; color: #64748b; font-weight: 500; align-self: center; }
+
+.error-msg {
+  background: #fef2f2; color: #dc2626;
+  padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; font-size: 14px;
+}
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.chart {
+  background: #fff; border: 1px solid #e2e8f0;
+  border-radius: 12px; padding: 16px;
+}
+
+.chart-wrap {
+  background: #fff; border-radius: 12px; padding: 20px; border: 1px solid #e2e8f0;
+}
+
+@media (max-width: 960px) {
+  .grid-2 { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .hero-title { font-size: 24px; }
+  .subnav-btn { padding: 7px 14px; font-size: 13px; }
+  .chart { padding: 10px; border-radius: 8px; }
+  .chart-wrap { padding: 12px; border-radius: 8px; }
+}
 </style>
 
 <style scoped>
@@ -66,7 +131,6 @@ body {
   flex-direction: column;
 }
 
-/* 品牌栏：全宽深色条 */
 .brand {
   background: #0f172a;
   color: #fff;
@@ -87,7 +151,6 @@ body {
   color: #e2e8f0;
 }
 
-/* 主导航 */
 .main-nav {
   display: flex;
   gap: 8px;
@@ -98,7 +161,7 @@ body {
   font-size: 14px;
   color: #94a3b8;
   text-decoration: none;
-  transition: all .2s ease;
+  transition: color .2s ease, background-color .2s ease;
 }
 .nav-link:hover {
   color: #e2e8f0;
@@ -109,8 +172,64 @@ body {
   background: rgba(255,255,255,0.12);
   font-weight: 500;
 }
+.nav-link:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 2px;
+}
 
-/* 页面内容区 */
+.brand-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.user-name {
+  font-size: 13px;
+  color: #e2e8f0;
+  font-weight: 500;
+}
+
+.logout-btn {
+  padding: 4px 12px;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 6px;
+  background: transparent;
+  color: #e2e8f0;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color .2s ease, border-color .2s ease;
+}
+.logout-btn:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.4);
+}
+.logout-btn:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 2px;
+}
+
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 16px;
+  background: #0f172a;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 0 0 6px 6px;
+  font-size: 14px;
+  z-index: 100;
+  text-decoration: none;
+}
+.skip-link:focus {
+  top: 0;
+}
+
 .page {
   flex: 1;
   max-width: 1280px;
@@ -119,7 +238,6 @@ body {
   padding: 32px 24px 48px;
 }
 
-/* 页脚 */
 .footer {
   border-top: 1px solid #e5e7eb;
   background: #fff;
@@ -133,5 +251,9 @@ body {
   .brand-inner { padding: 0 16px; }
   .page { padding: 20px 16px 32px; }
   .nav-link { padding: 6px 10px; font-size: 13px; }
+  .brand-actions { gap: 12px; }
+  .nav-right { gap: 10px; }
+  .user-name { font-size: 12px; }
+  .logout-btn { padding: 4px 10px; font-size: 12px; }
 }
 </style>

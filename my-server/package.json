@@ -1,18 +1,20 @@
 {
   "name": "my-server",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "中国教育数据可视化后端服务",
+  "main": "add.js",
   "scripts": {
+    "start": "node add.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "zdy",
   "license": "ISC",
   "dependencies": {
-    "body-parser": "^2.3.0",
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
     "mysql2": "^3.22.5"
   }
 }

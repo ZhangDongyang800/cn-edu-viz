@@ -1,194 +1,77 @@
-# 如何启动
+# 中国十年教育数据分析与可视化
 
+## 快速启动
+
+> **启动顺序**：MySQL → Python 分析服务 → Node.js 后端 → Vue 前端（每个服务需单独开一个终端）
+
+### 1. Python 分析服务（Conda 环境）
+
+```bash
+cd py-analysis
+# 创建并激活 Conda 虚拟环境
+conda create -n edu-viz python=3.11 -y
+conda activate edu-viz
+# 第一次请先下载依赖
+pip install -r requirements.txt
+# 启动
+python main.py
 ```
-#启动后端步骤
+
+### 2. Node.js 后端
+
+```bash
 cd my-server
-##第一次请先下载依赖
+# 第一次请先下载依赖
 npm install
-##启动
-node app.js
-
-
-#启动前端步骤
-cd my-vue
-##第一次请先下载依赖
-npm install
-##启动
-npm run dev
-
-
-
+# 启动
+node add.js
 ```
 
+### 3. Vue 前端
 
+```bash
+cd my-vue
+# 第一次请先下载依赖
+npm install
+# 启动
+npm run dev
+```
 
+---
 
+## 项目信息
 
-【腾讯文档】大数据技术分布式集群实践（2024级）-数据集与题目关系
- https://docs.qq.com/sheet/DTFRKSnRIQ0tqUnRs
+- **选题**：中国十年教育数据分析与可视化
+- **数据集**：国家统计局网站数据 (2015-2024) — [国家数据](https://data.stats.gov.cn/dg/website/page.html#/pc/national/fsYearData)
+- **参考文档**：[大数据技术分布式集群实践（2024级）- 数据集与题目关系](https://docs.qq.com/sheet/DTFRKSnRIQ0tqUnRs)
 
-选题：中国十年教育数据分析与可视化
+---
 
-数据集：国家统计局网站数据(2015-2024)[国家数据](https://data.stats.gov.cn/dg/website/page.html#/pc/national/fsYearData)
+## 项目概述
 
+| 维度 | 说明 |
+|------|------|
+| **项目简介** | 项目旨在通过深入分析和可视化中国过去十年的教育数据，揭示学校和学生的结构、动态与趋势。本项目将利用大数据技术，对全国教育数据进行综合分析，全面揭示教育体系的结构特征、动态变化与发展趋势。项目将整合全国范围内的教育统计数据，包括学生规模、师资配置、教育投入、学业表现等多维指标，运用大数据技术探究教育发展的内在规律及其与社会经济因素的关联性，为教育政策优化、资源分配和教学改革提供数据支撑。 |
+| **项目业务场景** | 随着中国社会经济的迅猛发展，教育领域作为国之大计，也经历了深刻的变革与显著的发展。对近十年教育数据进行深入剖析，有助于揭示教育发展背后的趋势与模式，洞察教育与社会经济发展之间的紧密联系。本项目聚焦于近十年教育数据，从多个关键维度展开分析，旨在为教育政策的制定与调整、教育资源的优化配置以及教育发展方向的把握提供坚实的数据支撑。 |
+| **基本功能要求** | 项目使用大数据 Flume、Hadoop、Spark 等技术，对数据进行采集、清洗、分析，结合后端技术（包括不局限于 Servlet、JSP、Spring Boot 等）和前端技术（HTML、CSS、JavaScript、jQuery、AJAX、Vue 等），最后进行可视化展现。 |
+| **非功能性要求** | 1、性能要求：系统应能高效处理大量数据，确保快速响应。2、用户界面：界面应直观易用，适合非技术背景用户。3、可扩展性：系统设计应考虑未来的扩展性和可维护性。4、文档和帮助：提供清晰的用户手册和在线帮助。 |
 
+### 功能要求明细
 
-项目：中国十年教育数据分析与可视化 
+1. **数据采集**：搜集近十年全国及各省市教育相关的数据
+2. **数据清洗**：对采集到的数据进行清洗和整合，包括去除重复数据、填充缺失值、转换数据类型等，确保数据质量和一致性
+3. **数据分析**：对数据进行多维度、多粒度的分析，包括但不限于：
+   - (1) 全国各类学校、教职工、专任教师数变化分析
+   - (2) 全国各类学历在校学生数据分析
+   - (3) 全国各类学校招生数、毕业生数、研究生数据分析
+   - (4) 职业技术培训机构数据分析
+   - (5) 初中学校和学生数据分析
+   - (6) 小学学校和学生数据分析
+4. **数据可视化**：将分析结果以图表的形式进行可视化展示，包括但不限于柱状图、折线图、饼图、地图等
 
-|              |                                                              |
-| ------------ | ------------------------------------------------------------ |
-| 项目简介     | 项目旨在通过深入分析和可视化中国过去十年的教育数据，揭示学校和学生的结构、动态与趋势。本项目将利用大数据技术，对全国教育数据进行综合分析，全面揭示教育体系的结构特征、动态变化与发展趋势。项目将整合全国范围内的教育统计数据，包括学生规模、师资配置、教育投入、学业表现等多维指标，运用大数据技术探究教育发展的内在规律及其与社会经济因素的关联性，为教育政策优化、资源分配和教学改革提供数据支撑。 |
-| 项目业务场景 | 随着中国社会经济的迅猛发展，教育领域作为国之大计，也经历了深刻的变革与显著的发展。对近十年教育数据进行深入剖析，有助于揭示教育发展背后的趋势与模式，洞察教育与社会经济发展之间的紧密联系。本项目聚焦于近十年教育数据，从多个关键维度展开分析，旨在为教育政策的制定与调整、教育资源的优化配置以及教育发展方向的把握提供坚实的数据支撑。 |
-| 基本功能要求 | 项目使用大数据Flume、Hadoop、Spark等技术，对数据进行采集、清洗、分析，结合后端技术（包括不局限于Servlet、JSP、Spring Boot等）和前端技术（HTML、CSS、JavaScript、  、jQuery、AJAX、Vue等），最后进行可视化展现。  功能要求：  1、数据采集：搜集近十年全国及各省市教育相关的数据。  2、数据清洗：对采集到的数据进行清洗和整合，包括去除重复数据、填充缺失值、转换数据类型等，确保数据质量和一致性。  3、数据分析：对数据进行多维度、多粒度的分析。包括但不限于以下维度和粒度：  (1) 全国各类学校、教职工、专任教师数变化分析；  (2) 全国各类学历在校学生数据分析；  (3) 全国各类学校招生数、毕业生数、研究生数据分析；  (4) 职业技术培训机构数据分析；  (5) 初中学校和学生数据分析；  (6) 小学学校和学生数据分析；  5、数据可视化：将分析结果以图表的形式进行可视化展示，包括但不限于柱状图、折线图、饼图、地图等。 |
-| 非功能性要求 | 1、性能要求：系统应能高效处理大量数据，确保快速响应。  2、用户界面：界面应直观易用，适合非技术背景用户。  3、可扩展性：系统设计应考虑未来的扩展性和可维护性。  4、文档和帮助：提供清晰的用户手册和在线帮助。 |
+---
 
-所有表DESCRIBE结果：Field Type Null Key Default Extra
+## 数据库表结构
 
-分省在校生数:
+详见csv文档[数据库表结构](./数据库表结构.csv)
 
-地区	varchar(255)	YES			
-2025年	varchar(255)	YES			
-2024年	double	YES			
-2023年	double	YES			
-2022年	double	YES			
-2021年	double	YES			
-2020年	double	YES			
-2019年	double	YES			
-2018年	double	YES			
-2017年	double	YES			
-2016年	double	YES			
-_c11	varchar(255)	YES			
-
-分省学位数:
-
-地区	varchar(255)	YES			
-2025年	varchar(255)	YES			
-2024年	double	YES			
-2023年	double	YES			
-2022年	double	YES			
-2021年	double	YES			
-2020年	double	YES			
-2019年	double	YES			
-2018年	double	YES			
-2017年	double	YES			
-2016年	double	YES			
-_c11	varchar(255)	YES			
-
-分省招生数:
-
-地区	varchar(255)	YES			
-2025年	varchar(255)	YES			
-2024年	double	YES			
-2023年	double	YES			
-2022年	double	YES			
-2021年	double	YES			
-2020年	double	YES			
-2019年	double	YES			
-2018年	double	YES			
-2017年	double	YES			
-2016年	double	YES			
-_c11	varchar(255)	YES			
-
-分省毕业生数：
-
-地区	varchar(255)	YES			
-2025年	varchar(255)	YES			
-2024年	double	YES			
-2023年	double	YES			
-2022年	double	YES			
-2021年	double	YES			
-2020年	double	YES			
-2019年	double	YES			
-2018年	double	YES			
-2017年	double	YES			
-2016年	double	YES			
-_c11	varchar(255)	YES			
-
-在校生数:
-
-指标	varchar(255)	YES			
-2025年	double	YES			
-2024年	double	YES			
-2023年	double	YES			
-2022年	double	YES			
-2021年	double	YES			
-2020年	double	YES			
-2019年	double	YES			
-2018年	double	YES			
-2017年	double	YES			
-2016年	double	YES			
-2015年	double	YES			
-2014年	double	YES			
-2013年	double	YES			
-2012年	double	YES			
-2011年	double	YES			
-_c16	varchar(255)	YES			
-
-学校数：
-
-地区	varchar(255)	YES			
-2024年	int	YES			
-2023年	int	YES			
-2022年	int	YES			
-2021年	int	YES			
-2020年	int	YES			
-2019年	int	YES			
-2018年	int	YES			
-2017年	int	YES			
-2016年	int	YES			
-_c10	varchar(255)	YES			
-
-招生数:
-
-指标	varchar(255)	YES			
-2025年	double	YES			
-2024年	double	YES			
-2023年	double	YES			
-2022年	double	YES			
-2021年	double	YES			
-2020年	double	YES			
-2019年	double	YES			
-2018年	double	YES			
-2017年	double	YES			
-2016年	double	YES			
-2015年	double	YES			
-2014年	double	YES			
-2013年	double	YES			
-2012年	double	YES			
-2011年	double	YES			
-_c16	varchar(255)	YES			
-
-教育经费:
-
-地区	varchar(255)	YES			
-2025年	varchar(255)	YES			
-2024年	varchar(255)	YES			
-2023年	int	YES			
-2022年	int	YES			
-2021年	int	YES			
-2020年	int	YES			
-2019年	int	YES			
-2018年	int	YES			
-2017年	int	YES			
-2016年	int	YES			
-_c11	varchar(255)	YES			
-
-毕业生数：
-
-指标	varchar(255)	YES			
-2025年	double	YES			
-2024年	double	YES			
-2023年	double	YES			
-2022年	double	YES			
-2021年	double	YES			
-2020年	double	YES			
-2019年	double	YES			
-2018年	double	YES			
-2017年	double	YES			
-2016年	double	YES			
-2015年	double	YES			
-2014年	double	YES			
-2013年	double	YES			
-2012年	double	YES			
-2011年	double	YES			
-_c16	varchar(255)	YES			
