@@ -1,10 +1,12 @@
 <script setup>
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import * as echarts from 'echarts'
+import { useRouter } from 'vue-router'
 import { useAuth } from '../stores/auth'
 import { darkTooltip, axisLineStyle, splitLineStyle, axisLabelStyle } from '../utils/echarts-config'
 
-const { getAuthHeaders } = useAuth()
+const router = useRouter()
+const { getAuthHeaders, logout } = useAuth()
 
 // 参数状态
 const tableList = ref([])           // 可用数据表列表
@@ -68,6 +70,12 @@ async function loadTables() {
     const res = await fetch('/api/analysis/available-tables', {
       headers: getAuthHeaders(),
     })
+    // token 过期或无效时自动退出并跳转登录页
+    if (res.status === 401) {
+      logout()
+      router.push('/login')
+      return
+    }
     if (!res.ok) throw new Error('获取数据表失败')
     tableList.value = await res.json()
     // 默认选中第一个全国表（API 返回后再设置）
@@ -131,6 +139,12 @@ async function runPrediction() {
       body: JSON.stringify(body),
     })
 
+    // token 过期或无效时自动退出并跳转登录页
+    if (res.status === 401) {
+      logout()
+      router.push('/login')
+      return
+    }
     if (!res.ok) {
       const err = await res.json().catch(() => ({}))
       throw new Error(err.detail || '预测失败')

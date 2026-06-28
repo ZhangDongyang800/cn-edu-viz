@@ -10,14 +10,16 @@ import {
 const props = defineProps({
   data: { type: Array, default: () => [] },
   columns: { type: Array, default: () => [] },
-  title: { type: String, default: '' }
+  title: { type: String, default: '' },
+  // 外部控制隐藏的系列名集合（用于排行榜联动）
+  hiddenSeries: { type: Array, default: () => [] }
 })
 
 const chartRef = ref(null)
 let chartInstance = null
 
-// 数据变化时重新渲染图表（浅监听即可，data 是整体替换的）
-watch(() => props.data, () => render())
+// 数据或隐藏系列变化时重新渲染
+watch(() => [props.data, props.hiddenSeries], () => render(), { deep: true })
 
 function render() {
   if (!chartRef.value) return
@@ -25,7 +27,10 @@ function render() {
   if (!props.data.length) { chartInstance.clear(); return }
 
   const firstCol = props.columns[0]
-  const yearCols = props.columns.filter(c => /\d{4}年/.test(c))
+  // 年份列按年份升序排列，确保 x 轴从左到右为 2011→2025
+  const yearCols = props.columns
+    .filter(c => /\d{4}年/.test(c))
+    .sort((a, b) => parseInt(a) - parseInt(b))
   const isProvince = firstCol === '地区'
   const isIndicator = firstCol === '指标'
 
@@ -39,11 +44,21 @@ function render() {
       symbol: 'circle',
       symbolSize: 6,
       lineStyle: { width: 2.5 },
-      data: yearCols.map(c => row[c] ?? null)
+      // 0 值视为占位符，替换为 null 使曲线断开而非跳到 0 点
+      data: yearCols.map(c => {
+        const v = row[c]
+        return (v == null || v === 0) ? null : v
+      })
     }))
 
     // y 轴数值统一保留两位小数，防止出现一长串小数
     const yAxisFormatter = v => Number.isFinite(v) ? v.toFixed(2) : v
+
+    // 构建 legend selected 映射：hiddenSeries 中的系列设为 false
+    const selectedMap = {}
+    series.forEach(s => {
+      selectedMap[s.name] = !props.hiddenSeries.includes(s.name)
+    })
 
     chartInstance.setOption({
       title: { ...titleStyle, text: props.title + ' 趋势' },
@@ -51,7 +66,8 @@ function render() {
       legend: {
         type: 'scroll', bottom: 0,
         itemWidth: 12, itemHeight: 12,
-        textStyle: { color: '#475569' }
+        textStyle: { color: '#475569' },
+        selected: selectedMap    // 通过 selected 控制系列显隐
       },
       grid: { ...baseGrid, bottom: 44 },
       xAxis: {
